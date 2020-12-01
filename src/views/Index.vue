@@ -109,8 +109,6 @@
 </template>
 
 <script>
-import user from "@/api/user";
-import Cookies from 'js-cookie'
 export default {
 name: "index",
   data() {

@@ -1,11 +1,11 @@
 import user from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, getRedirect, setRedirect, removeRedirect } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const state = {
   token: getToken(),
   name: '',
-  redirect: getRedirect
+  redirect: getRedirect()
 }
 
 const mutations = {
@@ -56,9 +56,7 @@ const actions = {
       commit('SET_NAME', '')
       commit('SET_UintOptions', '')
       removeToken()
-      removeMenus()
-      removeAvatar()
-      removeUnitOptions()
+      removeRedirect()
       resetRouter()
       resolve()
     })

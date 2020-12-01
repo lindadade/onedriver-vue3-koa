@@ -34,18 +34,13 @@ Vue.use(Router)
 export const constantRoutes = [
   {
     path: '/',
-    name: 'Index',
-    component: () => import('../views/Index')
+    name: 'Home',
+    component: () => import('../views/Home')
   },
   {
     path: '/login',
     name: 'Login',
     component: () => import('../views/Login/index')
-  },
-  {
-    path: '/home',
-    name: 'Home',
-    component: () => import('../views/Home')
   },
   {
     path: '/student',

@@ -1,6 +1,7 @@
 <template>
   <div>
-    <el-button plain @click="login">Gitee登陆</el-button>
+    <el-button plain @click="login('gitee')">Gitee登陆</el-button>
+    <el-button plain @click="login('oneDrive')">OneDrive登陆</el-button>
   </div>
 </template>
 
@@ -9,18 +10,16 @@ import user from "@/api/user";
 
 export default {
   name: "index",
-  created() {
+  async created() {
     if (window.location.search.includes('token')) {
-      console.log(window.location.search.replace('?token=', ''))
-      this.$store.dispatch('user/login', window.location.search.replace('?token=', ''))
+      await this.$store.dispatch('user/login', window.location.search.replace('?token=', ''))
+      window.location.href = `${window.location.origin}#${this.$store.getters.redirect}`
     }
   },
   methods: {
-    async login() {
-      const path = 'http://localhost:2020' + this.$route.fullPath
-      const {path: data} = await user.login({path})
-      console.log(data)
-      window.location.href = data;
+    async login(status) {
+      const {data} = await user.login({status})
+      location.href = data.path;
     }
   }
 }

@@ -1,13 +1,14 @@
 import Cookies from 'js-cookie'
 
 const TokenKey = 'token'
+const RedirectKey = 'redirect'
 
 export function getToken() {
   return Cookies.get(TokenKey)
 }
 
 export function setToken(token) {
-  return Cookies.set(TokenKey, token)
+  return Cookies.set(TokenKey, 'Bearer ' + token)
 }
 
 export function removeToken() {
@@ -15,13 +16,13 @@ export function removeToken() {
 }
 
 export function getRedirect() {
-  return Cookies.get(TokenKey)
+  return localStorage.getItem(RedirectKey)
 }
 
-export function setRedirect(token) {
-  return Cookies.set(TokenKey, token)
+export function setRedirect(redirect) {
+  return localStorage.setItem(RedirectKey, redirect)
 }
 
 export function removeRedirect() {
-  return Cookies.remove(TokenKey)
+  return localStorage.removeItem(RedirectKey)
 }

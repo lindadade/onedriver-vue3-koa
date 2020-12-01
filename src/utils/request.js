@@ -65,7 +65,7 @@ service.interceptors.request.use(
     if (store.getters.token) {
       // 让每个请求都携带 token
       // ['token'] 是一个自定义的 headers key
-      config.headers['token'] = getToken()
+      config.headers['Authorization'] = getToken()
     }
     return config
   },
@@ -88,49 +88,40 @@ service.interceptors.response.use(
    * 也可以通过HTTP状态码判断状态
    */
   async response => {
-    const ERROR = '网络请求错误'
-    if (response.status !== 200) {
+    const { status, statusText } = response
+    if (status !== 200) {
       Message({
-        message: ERROR,
+        message: statusText,
         type: 'error',
         duration: 5e3
       })
-      return Promise.reject(ERROR)
+      return Promise.reject(statusText)
     }
-    const res = response.data
-    const { code, msg } = res
     // 如果自定义代码不是200，则将其判断为错误
-    if (code !== 200) {
-      // 401: Token expired;
-      if (res.code === 401) {
-        // to re-login
-        await MessageBox.confirm(msg || '有效身份认证过期，请重新登录', '重新登录', {
+    if (status !== 200) {
+      Message({
+        message: statusText,
+        type: 'error',
+        duration: 5e3
+      })
+      return Promise.reject(new Error(statusText))
+    } else {
+      return response
+    }
+  },
+  async error => {
+    const code = error.toString().replace(/[^0-9]/ig,"")
+    switch (code) {
+      case '401':
+        await MessageBox.confirm('有效身份认证过期，请重新登录', '重新登录', {
           confirmButtonText: '重新登录',
           cancelButtonText: '取消',
           type: 'warning'
         })
         await store.dispatch('user/resetToken')
         location.reload()
-        return Promise.reject(new Error(msg || ERROR))
-      }
-      Message({
-        message: msg || ERROR,
-        type: 'error',
-        duration: 5e3
-      })
-      return Promise.reject(new Error(msg || ERROR))
-    } else {
-      return res
+        return Promise.reject(new Error(error))
     }
-  },
-  error => {
-    const TIMEOUT_ERROR = '网络请求超时，请刷新重试'
-    console.log('err' + error) // for debug
-    Message({
-      message: error.message.includes('timeout') ? TIMEOUT_ERROR : error.message,
-      type: 'error',
-      duration: 5e3
-    })
     return Promise.reject(error)
   }
 )

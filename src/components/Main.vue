@@ -10,7 +10,8 @@
         <template slot-scope="{row}">
           <!-- :disabled="row.folder && !row.folder.childCount"-->
           <el-button type="text" @click="row.folder ? handleFolder(row) : handleDownLoad(row)">
-            <img src="../assets/itemLogo/folder.svg" class="item-icon">
+<!--            <img :src="require(row.name)" class="item-icon">-->
+            <img :src="row.name | iconFilter" class="item-icon">
             <span class="item-text">
               {{ row.name }}
             </span>
@@ -75,6 +76,35 @@ export default {
         return sizeStr.substring(0, index) + sizeStr.substr(index + 3, 2)
       }
       return size;
+    },
+    iconFilter(value) {
+      if (!value.includes('.')) {
+        return require('../assets/svg/folder.svg')
+      }
+      const suffix = value.split('.')[1]
+      switch (suffix) {
+        case 'pdf':
+          return require('../assets/svg/pdf.svg')
+        break;
+        case 'png' || 'jpg' || 'jpeg' || 'bmp' || 'gif':
+          return require('../assets/svg/img.svg')
+          break;
+        case 'txt':
+          return require('../assets/svg/txt.svg')
+          break;
+        case 'xls' || 'xlsx':
+          return require('../assets/svg/excel.svg')
+          break;
+        case 'doc' || 'docx':
+          return require('../assets/svg/world.svg')
+          break;
+        case 'ppt' || 'pptx':
+          return require('../assets/svg/ppt.svg')
+          break;
+        case 'mp4' || 'm2v' || 'mkv' || 'rmvb' || 'wmv' || 'avi' || 'flv' || 'mov' || 'm4v':
+          return require('../assets/svg/video.svg')
+          break;
+      }
     }
   },
   data() {
@@ -87,7 +117,6 @@ export default {
   },
   async created() {
     await this.getList()
-
   },
   methods: {
     /**
@@ -115,7 +144,7 @@ export default {
       }
       let blob = new Blob([data.data], {type: fileType});
       let href = window.URL.createObjectURL(blob); //创建下载的链接
-      const win = window.open(href)
+      window.open(href)
     },
     async handleDownLoad({id, name}) {
       const loading = this.$loading({

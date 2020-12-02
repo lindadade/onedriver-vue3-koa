@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100%;">
     <div class="title-container">
       <span>林大大 - OneDriver网盘 ✨</span>
     </div>
@@ -13,7 +13,9 @@
             </div>
           </el-aside>
           <el-container>
-            <el-header>Header</el-header>
+            <el-header>
+	            <Header/>
+            </el-header>
             <el-divider/>
             <el-main>
               <Main/>
@@ -28,11 +30,13 @@
 <script>
 import Left from '@/components/Left'
 import Main from "@/components/Main"
+import Header from "@/components/Header";
 
 export default {
   components: {
     Left,
-    Main
+    Main,
+	  Header
   },
   data() {
     return {};
@@ -43,10 +47,10 @@ export default {
 
 <style>
 .title-container {
-  padding-top: 50px;
+  padding-bottom: 1%;
   width: 100%;
-  height: 120px;
-  font-size: 30px;
+  height: 100px;
+  font-size: 34px;
   text-align: center;
   line-height: 100px;
   background: linear-gradient(90deg, #405B55, #ddd);
@@ -65,18 +69,22 @@ export default {
 }
 
 .main-container {
-  padding: 0 8%;
+	height: 80%;
+  padding: 0 13%;
 }
 
+.el-card {
+	height: 100%;
+}
 .el-card__body {
   padding: 0;
-  height: 980px;
+	height: 100%;
 }
 
 .el-aside {
   background-color: #f7f7f7;
-  max-width: 244px;
-  height: 980px;
+  max-width: 20%;
+  height: 100%;
 }
 
 .el-main {
@@ -86,5 +94,9 @@ export default {
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 200px;
   min-height: 400px;
+}
+
+.el-divider--horizontal {
+	margin: 10px 0;
 }
 </style>

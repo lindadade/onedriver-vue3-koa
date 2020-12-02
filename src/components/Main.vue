@@ -8,9 +8,7 @@
     >
       <el-table-column prop="name" label="文件名" min-width="220">
         <template slot-scope="{row}">
-          <!-- :disabled="row.folder && !row.folder.childCount"-->
           <el-button type="text" @click="row.folder ? handleFolder(row) : handleDownLoad(row)">
-<!--            <img :src="require(row.name)" class="item-icon">-->
             <img :src="row.name | iconFilter" class="item-icon">
             <span class="item-text">
               {{ row.name }}
@@ -23,25 +21,24 @@
           <span>{{ row.size | sizeFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="创建日期" min-width="105" align="center">
+      <el-table-column label="创建日期" min-width="130px" align="center">
         <template #default="{row}">
           <span>{{ row.createdDateTime | timeFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="修改日期" min-width="105" align="center">
+      <el-table-column label="修改日期" min-width="130px" align="center">
         <template #default="{row}">
           <span>{{ row.lastModifiedDateTime | timeFilter }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" min-width="" align="center">
         <template slot-scope="{row,$index}">
-          <el-tooltip class="item" effect="dark" content="下载" placement="bottom-start">
+          <el-tooltip class="item" effect="dark" content="替换" placement="bottom-start">
             <el-button type="text"><i class="el-icon-download" @click="download(row.name)"></i></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="删除" placement="bottom-start">
             <el-button type="text"><i class="el-icon-delete" @click="del(row.name,$index)"></i></el-button>
           </el-tooltip>
-
         </template>
       </el-table-column>
     </el-table>

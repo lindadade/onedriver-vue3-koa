@@ -19,7 +19,7 @@ export default {
   methods: {
     async login(status) {
       const {data} = await user.login({status})
-      location.href = data.path;
+      location.href = data;
     }
   }
 }

@@ -1,8 +1,17 @@
 <template>
   <div>
+	  <el-breadcrumb separator-class="el-icon-arrow-right">
+		  <el-breadcrumb-item>
+			  <span @click="handleSelect()">首页</span>
+		  </el-breadcrumb-item>
+		  <el-breadcrumb-item v-for="(value, index) in breadcrumbList">
+			  <span @click="handleSelect()">{{value}}</span>
+		  </el-breadcrumb-item>
+
+	  </el-breadcrumb>
     <el-table
         v-loading="listLoading"
-        :data="list"
+        :data="fileList"
         element-loading-text="Loading"
         fit
     >
@@ -47,95 +56,54 @@
 
 <script>
 import oneDriver from "@/api/oneDriver";
-import {parseTime} from '@/utils'
+import {parseTime, fileSize, fileIcon} from '@/utils'
 
 export default {
   name: "Main",
+	props: {
+		fileList: {
+			type: Array,
+			default: ()=> {
+				return []
+			}
+		},
+		listLoading: {
+			type: Boolean,
+			default: false
+		}
+	},
   filters: {
     timeFilter(value) {
       return parseTime(value, '')
     },
-    sizeFilter(limit) {
-      let size = "";
-      if(limit < 0.1 * 1024){                            //小于0.1KB，则转化成B
-        size = limit.toFixed(2) + " B"
-      }else if(limit < 0.1 * 1024 * 1024){            //小于0.1MB，则转化成KB
-        size = (limit/1024).toFixed(2) + " KB"
-      }else if(limit < 0.1 * 1024 * 1024 * 1024){        //小于0.1GB，则转化成MB
-        size = (limit/(1024 * 1024)).toFixed(2) + " MB"
-      }else{                                            //其他转化成GB
-        size = (limit/(1024 * 1024 * 1024)).toFixed(2) + " GB"
-      }
-      const sizeStr = size + ""
-      const index = sizeStr.indexOf(".");                    //获取小数点处的索引
-      const dou = sizeStr.substr(index + 1 ,2)            //获取小数点后两位的值
-      if(dou == "00"){                                //判断后两位是否为00，如果是则删除00
-        return sizeStr.substring(0, index) + sizeStr.substr(index + 3, 2)
-      }
-      return size;
+    sizeFilter(value) {
+    	return fileSize(value)
     },
     iconFilter(value) {
-      if (!value.includes('.')) {
-        return require('../assets/svg/folder.svg')
-      }
-      const suffix = value.split('.')[1]
-      switch (suffix) {
-        case 'pdf':
-          return require('../assets/svg/pdf.svg')
-        break;
-        case 'png' || 'jpg' || 'jpeg' || 'bmp' || 'gif':
-          return require('../assets/svg/img.svg')
-          break;
-        case 'txt':
-          return require('../assets/svg/txt.svg')
-          break;
-        case 'xls' || 'xlsx':
-          return require('../assets/svg/excel.svg')
-          break;
-        case 'doc' || 'docx':
-          return require('../assets/svg/world.svg')
-          break;
-        case 'ppt' || 'pptx':
-          return require('../assets/svg/ppt.svg')
-          break;
-        case 'mp4' || 'm2v' || 'mkv' || 'rmvb' || 'wmv' || 'avi' || 'flv' || 'mov' || 'm4v':
-          return require('../assets/svg/video.svg')
-          break;
-      }
+	    return fileIcon(value)
     }
   },
   data() {
     return {
       total: 0,
-      list: [],
-      listLoading: false,
-      file: undefined
+      file: undefined,
+	    breadcrumbList: []
     };
-  },
-  async created() {
-    await this.getList()
-  },
+	},
   methods: {
-    /**
-     * @description 获取根列表
-     * @returns {Promise<void>}
-     */
-    async getList() {
-      this.listLoading = true
-      const {data} = await oneDriver.getAppRoot()
-      this.list = data.value
-      this.total = data['@odata.count']
-      this.listLoading = false
-    },
     async handleFolder({id}) {
-      this.listLoading = true
+	    this.breadcrumbList = []
+	    this.$emit('update:listLoading', true)
       const {data} = await oneDriver.getItemChild(id)
-      this.list = data.value
+	    const breadcrumbMap = data.value[0].parentReference.path.split('/')
+	    for (let i = 4; i < breadcrumbMap.length; i++) {
+	    	this.breadcrumbList.push(decodeURIComponent(breadcrumbMap[i]))
+	    }
+	    this.$emit('update:fileList', data.value)
       this.total = data['@odata.count']
-      this.listLoading = false
+	    this.$emit('update:listLoading', false)
     },
     async openFile(data, name, fileType) {
-      console.log(data, name)
       if (!data) {
         return this.$message.error('无文件数据，下载文件失败！');
       }
@@ -151,10 +119,12 @@ export default {
         background: 'rgba(154, 190, 175, 0.7)'
       });
       const data = await oneDriver.downLoadItem(id)
-      console.log(data)
       loading.close()
       await this.openFile(data, name, data.headers['content-type'])
-    }
+    },
+	  handleSelect() {
+		  this.$emit('handleSelect')
+	  }
   }
 }
 </script>

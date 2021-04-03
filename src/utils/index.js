@@ -143,3 +143,54 @@ export function getCurrentMonthLast() {
   const d = lastDate.getDate()
   return `${y}-${m}-${d}`
 }
+
+export function fileSize(limit) {
+	let size = "";
+	if(limit < 0.1 * 1024){                            //小于0.1KB，则转化成B
+		size = limit.toFixed(2) + " B"
+	}else if(limit < 0.1 * 1024 * 1024){            //小于0.1MB，则转化成KB
+		size = (limit/1024).toFixed(2) + " KB"
+	}else if(limit < 0.1 * 1024 * 1024 * 1024){        //小于0.1GB，则转化成MB
+		size = (limit/(1024 * 1024)).toFixed(2) + " MB"
+	}else{                                            //其他转化成GB
+		size = (limit/(1024 * 1024 * 1024)).toFixed(2) + " GB"
+	}
+	const sizeStr = size + ""
+	const index = sizeStr.indexOf(".");                    //获取小数点处的索引
+	const dou = sizeStr.substr(index + 1 ,2)            //获取小数点后两位的值
+	if(dou == "00"){                                //判断后两位是否为00，如果是则删除00
+		return sizeStr.substring(0, index) + sizeStr.substr(index + 3, 2)
+	}
+	return size;
+}
+
+export function fileIcon(value) {
+	if (!value.includes('.')) {
+		return require('../assets/svg/folder.svg')
+	}
+	const suffix = value.split('.')[1]
+	console.log(suffix)
+	switch (suffix) {
+		case 'pdf':
+			return require('../assets/svg/pdf.svg')
+			break;
+		case 'png': case 'jpg': case 'jpeg': case 'bmp': case 'gif':
+			return require('../assets/svg/img.svg')
+			break;
+		case 'txt':
+			return require('../assets/svg/txt.svg')
+			break;
+		case 'xls': case 'xlsx':
+			return require('../assets/svg/excel.svg')
+			break;
+		case 'doc': case 'docx':
+			return require('../assets/svg/world.svg')
+			break;
+		case 'ppt' : case 'pptx':
+			return require('../assets/svg/ppt.svg')
+			break;
+		case 'mp4': case 'm2v': case 'mkv': case 'rmvb': case 'wmv': case 'avi': case 'flv': case 'mov': case 'm4v':
+			return require('../assets/svg/video.svg')
+			break;
+	}
+}

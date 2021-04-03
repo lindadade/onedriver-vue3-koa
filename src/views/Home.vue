@@ -9,7 +9,15 @@
         <el-container>
           <el-aside >
             <div class="left-container">
-              <Left/>
+	            <el-menu :default-active="firstIndex" class="el-menu-vertical-demo" @select="handleSelect" :loading="listLoading">
+		            <div class="left-head">
+			            图片
+		            </div>
+		            <el-menu-item v-for="(data, i) in list" :key="i" :index="data.id">
+			            <i class="el-icon-menu"></i>
+			            <span slot="title">{{data.name}}</span>
+		            </el-menu-item>
+	            </el-menu>
             </div>
           </el-aside>
           <el-container>
@@ -18,7 +26,7 @@
             </el-header>
             <el-divider/>
             <el-main>
-              <Main/>
+              <Main :listLoading.sync="listLoading" :fileList.sync="fileList" @handleSelect="handleSelect(activeIndex)"/>
             </el-main>
           </el-container>
         </el-container>
@@ -28,20 +36,46 @@
 </template>
 
 <script>
-import Left from '@/components/Left'
+import oneDriver from "@/api/oneDriver";
 import Main from "@/components/Main"
 import Header from "@/components/Header";
 
 export default {
   components: {
-    Left,
     Main,
 	  Header
   },
   data() {
-    return {};
+    return {
+    	firstIndex: '',
+	    activeIndex: '',
+	    list: [],
+	    listLoading: false,
+	    fileList: []
+    };
   },
-  methods: {}
+	async created() {
+		await this.getList()
+		await this.handleSelect(this.firstIndex)
+	},
+	methods: {
+		/**
+		 * @description 获取根列表
+		 * @returns {Promise<void>}
+		 */
+		async getList() {
+			const {data} = await oneDriver.getAppRoot()
+			this.list = data.value
+			this.firstIndex = this.list[0].id
+		},
+		async handleSelect(index) {
+			this.activeIndex = index
+			this.listLoading = true
+			const {data} = await oneDriver.getItemChild(this.activeIndex)
+			this.fileList = data.value
+			this.listLoading = false
+		}
+	}
 }
 </script>
 
@@ -75,15 +109,19 @@ export default {
 
 .el-card {
 	height: 100%;
+	border: none;
 }
 .el-card__body {
   padding: 0;
 	height: 100%;
 }
+.el-container {
+	height: 100%;
+}
 
 .el-aside {
-  background-color: #f7f7f7;
-  max-width: 20%;
+  background-color: #f6f6f6;
+  max-width: 19%;
   height: 100%;
 }
 
@@ -98,5 +136,18 @@ export default {
 
 .el-divider--horizontal {
 	margin: 10px 0;
+}
+.el-menu {
+	border: 0px;
+	background-color: #f6f6f6;
+}
+.left-head {
+	height: 120px;
+	line-height: 120px;
+	font-size: 30px;
+	text-align: center;
+}
+.is-active {
+	background-color: #e5e5e5;
 }
 </style>
